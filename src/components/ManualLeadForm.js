@@ -1,38 +1,48 @@
 // src/components/ManualLeadForm.js
 import React, { useState } from 'react';
 
-const ManualLeadForm = ({ onLeadCreated }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+const ManualLeadForm = ({ role, userEmail, onLeadCreated }) => {
+  const [lead, setLead] = useState({ name: '', email: '', phone: '', status: 'New', source: 'Manual', assignedTo: userEmail });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const lead = {
-      ...formData,
-      status: 'New',
-      source: 'Manual'
-    };
-    onLeadCreated(lead);
-    setFormData({ name: '', email: '', phone: '' });
+    if (lead.name && lead.email) {
+      onLeadCreated(lead);
+      setLead({ ...lead, name: '', email: '', phone: '' });
+    }
   };
 
+  if (role !== 'admin' && role !== 'agent') {
+    return <p className="text-red-500">You don't have permission to create leads.</p>;
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded mb-4">
-      <h2 className="text-lg font-bold mb-2">Manual Lead Form</h2>
-      <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="border p-2 mb-2 w-full" />
-      <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="border p-2 mb-2 w-full" />
-      <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" className="border p-2 mb-2 w-full" />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">Create Lead</button>
+    <form onSubmit={handleSubmit} className="p-4 border rounded">
+      <h2 className="text-lg font-bold mb-2">Manual Lead Entry</h2>
+      <input
+        type="text"
+        placeholder="Name"
+        value={lead.name}
+        onChange={(e) => setLead({ ...lead, name: e.target.value })}
+        className="block w-full mb-2 p-2 border rounded"
+        required
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        value={lead.email}
+        onChange={(e) => setLead({ ...lead, email: e.target.value })}
+        className="block w-full mb-2 p-2 border rounded"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Phone"
+        value={lead.phone}
+        onChange={(e) => setLead({ ...lead, phone: e.target.value })}
+        className="block w-full mb-2 p-2 border rounded"
+      />
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Create</button>
     </form>
   );
 };
